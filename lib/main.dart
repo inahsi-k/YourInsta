@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:yourinsta/screens/signup.dart';
+import 'package:yourinsta/providers/user_provider.dart';
+import 'package:yourinsta/responsive/mobile_screen.dart';
+import 'package:yourinsta/responsive/responsive_layout.dart';
+import 'package:yourinsta/responsive/web_screen.dart';
+import 'package:yourinsta/screens/login.dart';
 import 'package:yourinsta/utils.dart/colors.dart';
 
 void main() async {
@@ -21,17 +27,43 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "YourInsta",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: mobileBackgroundColor,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create:(_)=> UserProvider()),
+      ],
+      child: MaterialApp(
+        title: "YourInsta",
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: mobileBackgroundColor,
+        ),
+      
+        // home: const ResponsiveLayout(
+        //   webScreen: WebScreen(),
+        //   mobileScreen: MobileScreen(),
+        // ),
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.idTokenChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.hasData) {
+                return const ResponsiveLayout(
+                  webScreen: WebScreen(),
+                  mobileScreen: MobileScreen(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('${snapshot.error}'));
+              }
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(color: primaryColor),
+              );
+            }
+            return const LoginScreen();
+          },
+        ),
       ),
-      // home: const ResponsiveLayout(
-      //   webScreen: WebScreen(),
-      //   mobileScreen: MobileScreen(),
-      // ),
-      home: SignupScreen(),
     );
   }
 }

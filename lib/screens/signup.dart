@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yourinsta/resources/authentication.dart';
+import 'package:yourinsta/screens/login.dart';
 import 'package:yourinsta/utils.dart/colors.dart';
 import 'package:yourinsta/utils.dart/pick_image.dart';
 import 'package:yourinsta/widgets/text_field.dart';
@@ -38,6 +39,12 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _image = img;
     });
+  }
+
+  void navigateToLogin() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
   @override
@@ -176,7 +183,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: navigateToLogin,
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Text(
